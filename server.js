@@ -1,3 +1,4 @@
+
 const express = require("express");
 const multer = require("multer");
 const AWS = require("aws-sdk");
@@ -6,71 +7,58 @@ const path = require("path");
 
 const app = express();
 
-// ===================================
+// =====================================
 // STORJ CONFIGURATION
-// ===================================
-
-// नीचे की चारों वैल्यू Render के Environment
-// Variables से अपने आप ली जाएँगी।
+// Set these in Render Environment Variables
+// =====================================
 
 const STORJ_ENDPOINT =
   process.env.STORJ_ENDPOINT || "https://gateway.storjshare.io";
 
-const STORJ_ACCESS_KEY =
-  process.env.STORJ_ACCESS_KEY || "jvl3xupb6lzwu6qxkdw3i3byjyxa";
+const STORJ_ACCESS_KEY = jviig6q7s4fou4hadvy77ubvih7a;
+const STORJ_SECRET_KEY = jzv3lqn3nreq4vondysfptk5fv4mjxwpwo2colbshfuuwcmgfu2ka;
+const STORJ_BUCKET = ghostninja73;
 
-const STORJ_SECRET_KEY =
-  process.env.STORJ_SECRET_KEY || "j35hlx4diu4dsb5bpouf72myzsgbtyfrw4c5deqj7suewumuga4bq";
-
-const STORJ_BUCKET =
-  process.env.STORJ_BUCKET || "ghostninja73";
-
-
-// ===================================
+// =====================================
 // MIDDLEWARE
-// ===================================
+// =====================================
 
-app.use(cors());
+app.use(cors({
+  origin: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 app.use(express.static(__dirname));
 
+// Log requests before routes
+app.use((req, res, next) => {
+  console.log(
+    `[REQUEST] ${new Date().toISOString()} ${req.method} ${req.url}`
+  );
+  next();
+});
 
-// ===================================
-// FILE UPLOAD CONFIGURATION
-// ===================================
+// =====================================
+// MULTER CONFIGURATION
+// =====================================
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 500 * 1024 * 1024
+    fileSize: 500 * 1024 * 1024,
+    files: 1
   }
 });
 
-
-// ===================================
-// STORJ S3 CONNECTION
-// ===================================
+// =====================================
+// STORJ S3 CLIENT
+// =====================================
 
 let s3 = null;
 
-function configureStorj() {
-  if (
-    !STORJ_ENDPOINT ||
-    !STORJ_ACCESS_KEY ||
-    !STORJ_SECRET_KEY ||
-    !STORJ_BUCKET
-  ) {
-    console.error(
-      "[CONFIG ERROR] Storj configuration is incomplete."
-    );
-
-    console.error(
-      "Please configure STORJ_ENDPOINT, STORJ_ACCESS_KEY, STORJ_SECRET_KEY and STORJ_BUCKET in Render."
-    );
-
-    return false;
-  }
-
+if (STORJ_ACCESS_KEY && STORJ_SECRET_KEY && STORJ_BUCKET) {
   s3 = new AWS.S3({
     endpoint: STORJ_ENDPOINT,
     accessKeyId: STORJ_ACCESS_KEY,
@@ -79,41 +67,16 @@ function configureStorj() {
     signatureVersion: "v4"
   });
 
-  console.log(
-    "[CONFIG] Storj environment variables are configured."
+  console.log("[CONFIG] Storj client initialized.");
+} else {
+  console.error(
+    "[CONFIG ERROR] Missing Storj environment variables."
   );
-
-  return true;
 }
 
-configureStorj();
-
-
-// ===================================
-// REQUEST LOGS
-// ===================================
-
-app.use((req, res, next) => {
-  console.log(
-    `[REQUEST] ${new Date().toISOString()} ${req.method} ${req.url}`
-  );
-
-  next();
-});
-
-
-// ===================================
-// HOME PAGE
-// ===================================
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-
-// ===================================
+// =====================================
 // HEALTH CHECK
-// ===================================
+// =====================================
 
 app.get("/health", (req, res) => {
   res.json({
@@ -122,23 +85,15 @@ app.get("/health", (req, res) => {
   });
 });
 
-
-// ===================================
+// =====================================
 // STORJ CONFIGURATION CHECK
-// ===================================
+// =====================================
 
 app.get("/storj-test", (req, res) => {
-  const configured = Boolean(
-    STORJ_ENDPOINT &&
-    STORJ_ACCESS_KEY &&
-    STORJ_SECRET_KEY &&
-    STORJ_BUCKET
-  );
-
-  if (!configured) {
+  if (!s3) {
     return res.status(500).json({
       success: false,
-      message: "Storj configuration is missing."
+      message: "Storj environment variables are missing."
     });
   }
 
@@ -148,35 +103,51 @@ app.get("/storj-test", (req, res) => {
   });
 });
 
+// =====================================
+// HOME PAGE
+// =====================================
 
-// ===================================
-// APK UPLOAD API
-// ===================================
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
-app.post(
-  "/upload",
-  upload.single("file"),
-  async (req, res) => {
+// =====================================
+// APK UPLOAD
+// =====================================
+
+app.post("/upload", (req, res) => {
+  console.log("[UPLOAD] Request received.");
+
+  upload.single("file")(req, res, async (err) => {
+    if (err) {
+      console.error("[UPLOAD PARSE ERROR]", err.message);
+
+      return res.status(
+        err.code === "LIMIT_FILE_SIZE" ? 413 : 400
+      ).json({
+        success: false,
+        error: err.code === "LIMIT_FILE_SIZE"
+          ? "File exceeds the 500 MB limit."
+          : err.message
+      });
+    }
+
     try {
-      console.log("[UPLOAD] Upload request received.");
-
       if (!req.file) {
         return res.status(400).json({
           success: false,
-          error: "No file received. Select a file first."
+          error: "No file received."
         });
       }
 
       if (!s3) {
         return res.status(500).json({
           success: false,
-          error: "Storj is not configured. Check Render Environment Variables."
+          error: "Storj is not configured. Check Render environment variables."
         });
       }
 
-      const originalName = path.basename(
-        req.file.originalname
-      );
+      const originalName = path.basename(req.file.originalname);
 
       if (!originalName.toLowerCase().endsWith(".apk")) {
         return res.status(400).json({
@@ -185,20 +156,19 @@ app.post(
         });
       }
 
-      const fileKey =
-        Date.now() + "-" + originalName;
+      const fileKey = `${Date.now()}-${originalName}`;
 
       console.log(
-        "[UPLOAD] Uploading file to Storj:",
-        originalName
+        "[UPLOAD] Uploading to Storj:",
+        originalName,
+        `(${req.file.size} bytes)`
       );
 
       const result = await s3.upload({
         Bucket: STORJ_BUCKET,
         Key: fileKey,
         Body: req.file.buffer,
-        ContentType:
-          "application/vnd.android.package-archive"
+        ContentType: "application/vnd.android.package-archive"
       }).promise();
 
       console.log("[UPLOAD] Storj upload successful.");
@@ -214,39 +184,53 @@ app.post(
     } catch (error) {
       console.error(
         "[UPLOAD ERROR]",
+        error.code || "UNKNOWN",
         error.message
       );
 
       return res.status(500).json({
         success: false,
-        error: "Upload failed. Check Render logs and Storj settings."
+        error: "Storj upload failed. Check Render logs and bucket permissions."
       });
     }
-  }
-);
+  });
+});
 
-
-// ===================================
+// =====================================
 // NOT FOUND
-// ===================================
+// =====================================
 
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     error: "Route not found",
-    route: req.method + " " + req.path
+    route: `${req.method} ${req.path}`
   });
 });
 
+// =====================================
+// SERVER ERROR HANDLER
+// =====================================
 
-// ===================================
-// SERVER START
-// ===================================
+app.use((err, req, res, next) => {
+  console.error("[SERVER ERROR]", err.message);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    success: false,
+    error: "Internal server error"
+  });
+});
+
+// =====================================
+// START SERVER
+// =====================================
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(
-    `Server running on port ${PORT}`
-  );
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
