@@ -1,303 +1,222 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10131f">
-<title>DroidNova — Android App Store</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova Store - Apps & Games</title>
+<meta name="theme-color" content="#0b1020">
 <style>
-:root{--bg:#0b0e17;--panel:#121827;--panel2:#182136;--text:#f4f6ff;--muted:#9ca8c2;--line:#29334b;--accent:#a99bff;--mint:#62e6c4}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 75% -15%,#28245a,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0}
-.wrap{max-width:1150px;margin:auto;padding:0 20px}
-header{position:sticky;top:0;z-index:5;background:#0b0e17e8;backdrop-filter:blur(15px);border-bottom:1px solid #ffffff15}
-.nav{min-height:72px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
-.brand{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:850;white-space:nowrap}
-.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--mint));display:grid;place-items:center;color:#101020;font-size:22px}
-.brand em{font-style:normal;color:var(--mint)}
-.search{flex:1;min-width:170px}
-.search input{width:100%;padding:12px 15px;border-radius:13px;border:1px solid var(--line);background:var(--panel);color:white;outline:none}
-.btn{border-radius:12px;padding:11px 15px;font-weight:750}
-.primary{background:var(--accent);color:#111020}
-.secondary{background:var(--panel2);border:1px solid var(--line);color:white}
-.hero{padding:52px 0 30px;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center}
-.eyebrow{font-size:11px;letter-spacing:2px;color:var(--mint);font-weight:800;text-transform:uppercase}
-.hero h1{font-size:clamp(38px,5vw,62px);line-height:1.04;letter-spacing:-2px;margin:14px 0}
-.gradient{background:linear-gradient(90deg,#c8bfff,var(--mint));color:transparent;background-clip:text}
-.hero p{max-width:570px;color:var(--muted);font-size:17px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.art{min-height:220px;display:grid;place-items:center;position:relative}
-.orb{width:205px;height:205px;border-radius:55px;transform:rotate(-9deg);display:grid;place-items:center;font-size:92px;background:linear-gradient(145deg,#282650,#111a2a);border:1px solid #ffffff25;box-shadow:0 25px 70px #0008}
-.float{position:absolute;padding:11px 13px;border:1px solid #ffffff25;background:#171e30;border-radius:14px;font-size:12px}
-.f1{top:12px;left:0}.f2{bottom:13px;right:0}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0 35px}
-.stat{padding:14px;border:1px solid var(--line);border-radius:15px;background:#121827bb}
-.stat b{display:block;font-size:20px}.stat small{color:var(--muted)}
-.head{margin:32px 0 16px}.head h2{font-size:25px;margin:0}
-.head p{color:var(--muted);margin:4px 0}
-.cats{display:flex;gap:8px;overflow:auto;padding:2px 0 10px}
-.chip{white-space:nowrap;padding:9px 14px;border:1px solid var(--line);border-radius:99px;background:var(--panel);color:#d3d9ea}
-.chip.active{background:var(--accent);color:#111020;font-weight:800}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.app{padding:16px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(150deg,#151d30,#101522);min-width:0}
-.apptop{display:flex;align-items:center;gap:12px}
-.appicon{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;flex-shrink:0;font-size:27px;background:linear-gradient(135deg,#a99bff,#62e6c4);color:#101020;background-size:cover}
-.app h3{margin:0;font-size:16px;overflow-wrap:anywhere}
-.dev{color:var(--muted);font-size:12px}
-.tag{font-size:10px;letter-spacing:.7px;color:var(--mint);text-transform:uppercase;font-weight:800}
-.desc{color:#b5bfd5;font-size:13px;min-height:40px;margin:14px 0}
-.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:11px}
-.appactions{display:flex;gap:8px;margin-top:12px}
-.appactions button{flex:1;border-radius:10px;padding:9px 6px;font-weight:750;font-size:12px}
-.get{background:#d9d2ff;color:#15132a}.details{background:#222c42;color:#e5eaff}
-.empty{display:none;text-align:center;padding:30px;color:var(--muted)}
-.notice{margin:30px 0;background:#151b2b;border:1px solid #363d5b;border-radius:15px;padding:17px;color:#b8c2d8;font-size:13px}
-.notice strong{color:white}
-.footer{border-top:1px solid var(--line);margin-top:42px;padding:24px 0 35px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
-.back{display:none;position:fixed;inset:0;z-index:20;background:#050711df;backdrop-filter:blur(8px);padding:16px;overflow:auto;align-items:center;justify-content:center}
-.back.show{display:flex}
-.modal{width:min(540px,100%);max-height:92vh;overflow:auto;padding:22px;border:1px solid var(--line);border-radius:21px;background:#141b2c}
-.modal h2{margin:0 0 5px}
-.modal p,.hint{font-size:13px;color:var(--muted)}
-.field{display:block;margin:12px 0}
-.field span{display:block;font-size:12px;margin-bottom:5px;color:#c5cce0}
-.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0c1120;color:white}
-.field textarea{min-height:75px}
-.foot{display:flex;justify-content:flex-end;gap:9px;margin-top:15px}
-.toast{display:none;position:fixed;z-index:40;bottom:18px;left:50%;transform:translateX(-50%);max-width:90%;background:#e4e0ff;color:#111020;padding:12px 17px;border-radius:12px;font-weight:750;text-align:center}
-@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:36px}.art{min-height:185px}.orb{width:155px;height:155px;border-radius:42px;font-size:70px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nav{gap:10px}.search{order:3;flex-basis:100%}.stats{gap:7px}.stat{padding:11px}}
-@media(max-width:480px){.wrap{padding:0 14px}.grid{grid-template-columns:1fr}.hero h1{letter-spacing:-1px}.hero p{font-size:15px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{display:none}.head h2{font-size:22px}}
+body{margin:0;background:#0b1020;color:#f4f6ff;font-family:Arial,sans-serif}
+header{position:sticky;top:0;background:#10172bea;backdrop-filter:blur(12px);padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:5;border-bottom:1px solid #26304a}
+.logo{font-size:23px;font-weight:900;color:#a78bfa}
+button{border:0;cursor:pointer;font-weight:bold;border-radius:12px;padding:12px 16px}
+.upload{background:#8b5cf6;color:white}
+main{max-width:1150px;margin:auto;padding:24px 5%}
+.hero{padding:35px 25px;border-radius:24px;background:linear-gradient(120deg,#4c1d95,#312e81,#172554);margin:12px 0 25px}
+.hero h1{font-size:clamp(28px,6vw,45px);margin:0 0 12px}
+.hero p{color:#e0e7ff;line-height:1.6}
+.search{width:100%;padding:15px;border-radius:13px;border:1px solid #303b58;background:#151d31;color:white;font-size:16px;outline:none}
+.categories{display:flex;gap:9px;overflow-x:auto;padding:20px 0}
+.categories button{background:#1a2339;color:#cbd5e1;white-space:nowrap}
+.categories button.active{background:#8b5cf6;color:white}
+h2{font-size:23px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{background:#141c30;border:1px solid #27324c;padding:17px;border-radius:18px;min-width:0}
+.appicon{height:62px;width:62px;border-radius:17px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,#4338ca,#a855f7);margin-bottom:14px}
+.card h3{margin:0 0 8px;overflow-wrap:anywhere}
+.meta{font-size:12px;color:#9caac5;margin:8px 0}
+.description{color:#c1cbe0;font-size:14px;line-height:1.5;min-height:42px}
+.download{width:100%;background:#293653;color:white;margin-top:10px}
+.download:hover{background:#3b4b70}
+.empty{color:#aab5cb;padding:20px 0}
+#uploadPanel{display:none;background:#141c30;border:1px solid #34405e;border-radius:18px;padding:20px;margin:20px 0}
+#uploadPanel input,#uploadPanel select,#uploadPanel textarea{display:block;width:100%;padding:12px;margin:10px 0 15px;background:#0b1020;color:white;border:1px solid #35415e;border-radius:10px}
+#status{color:#c4b5fd;overflow-wrap:anywhere}
+footer{text-align:center;color:#8996b1;padding:30px 12px;font-size:13px}
+.small{font-size:12px;color:#9caac5}
+@media(max-width:480px){header{padding:12px 4%}.logo{font-size:19px}.upload{padding:10px;font-size:12px}main{padding:18px 4%}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:12px}.hero{padding:25px 18px}}
 </style>
 </head>
 <body>
 <header>
-<div class="wrap nav">
-<div class="brand"><div class="logo">✦</div><span>Droid<em>Nova</em></span></div>
-<div class="search"><input id="search" placeholder="Search apps, games, tools…"></div>
-<button type="button" class="btn primary" id="submitBtn">＋ Submit app</button>
-</div>
+  <div class="logo">✦ Nova Store</div>
+  <button class="upload" id="openUpload">＋ Upload APK</button>
 </header>
 
-<main class="wrap">
-<section class="hero">
-<div>
-<div class="eyebrow">Your next favorite app starts here</div>
-<h1>Discover apps.<br><span class="gradient">Unlock more.</span></h1>
-<p>A fresh home for Android apps and games. Explore tools, find something new, and keep your digital world moving.</p>
-<div class="actions">
-<button type="button" class="btn primary" id="explore">Explore apps ↓</button>
-<button type="button" class="btn secondary" id="how">How it works</button>
-</div>
-</div>
-<div class="art"><div class="float f1">✧ Curated discoveries</div><div class="orb">◈</div><div class="float f2">Android apps, one hub</div></div>
-</section>
+<main>
+  <section class="hero">
+    <h1>Discover Your Next App.</h1>
+    <p>Explore apps, games and useful tools — all in one place.</p>
+    <button class="upload" onclick="document.getElementById('apps').scrollIntoView({behavior:'smooth'})">Explore Apps ↓</button>
+  </section>
 
-<section class="stats">
-<div class="stat"><b id="count">06</b><small>Apps to explore</small></div>
-<div class="stat"><b>Free</b><small>To browse</small></div>
-<div class="stat"><b>Android</b><small>Built for your device</small></div>
-</section>
+  <input id="search" class="search" placeholder="Search apps and games..." aria-label="Search apps">
 
-<section id="catalog">
-<div class="head"><h2>Explore the catalog</h2><p>Find your next useful download.</p></div>
-<div class="cats">
-<button type="button" class="chip active" data-cat="All">All apps</button>
-<button type="button" class="chip" data-cat="Tools">Tools</button>
-<button type="button" class="chip" data-cat="Games">Games</button>
-<button type="button" class="chip" data-cat="Personalization">Personalization</button>
-<button type="button" class="chip" data-cat="Productivity">Productivity</button>
-</div>
-<div class="grid" id="grid"></div>
-<div class="empty" id="empty">No apps found. Try another search or category.</div>
-</section>
+  <div class="categories" id="categories">
+    <button class="active" data-cat="All">All</button>
+    <button data-cat="Games">Games</button>
+    <button data-cat="Apps">Apps</button>
+    <button data-cat="Tools">Tools</button>
+    <button data-cat="Productivity">Productivity</button>
+    <button data-cat="Entertainment">Entertainment</button>
+  </div>
 
-<div class="notice"><strong>Stay safe:</strong> Only install APKs from developers you trust. Check permissions and scan files with a reputable security tool. APK files are uploaded to your connected Storj storage. This page saves listing details in this browser; a shared public catalog needs a server-side listing database/API.</div>
+  <section id="uploadPanel">
+    <h2>Upload an APK</h2>
+    <p class="small">Upload only apps you have permission to distribute.</p>
+    <form id="uploadForm">
+      <label>App name</label>
+      <input name="name" required maxlength="80" placeholder="Enter app name">
+      <label>Category</label>
+      <select name="category">
+        <option>Games</option><option>Apps</option><option>Tools</option>
+        <option>Productivity</option><option>Entertainment</option>
+      </select>
+      <label>Short description</label>
+      <textarea name="description" required maxlength="300" placeholder="What does this app do?"></textarea>
+      <label>APK file</label>
+      <input name="file" type="file" accept=".apk,application/vnd.android.package-archive" required>
+      <button class="upload" type="submit">Upload APK</button>
+      <button type="button" id="cancelUpload" style="background:#293653;color:white">Cancel</button>
+      <p id="status" role="status"></p>
+    </form>
+  </section>
+
+  <h2 id="apps">Popular Apps & Games</h2>
+  <div class="grid" id="appGrid"></div>
+  <p class="empty" id="empty" hidden>No apps found. Try another search.</p>
 </main>
 
-<footer class="wrap footer">
-<span>© 2026 DroidNova · Independent Android app directory</span>
-<span>Made for discovery, built with care.</span>
-</footer>
-
-<div class="back" id="uploadBack">
-<div class="modal">
-<h2>Submit an Android app</h2>
-<p>Submit app details and upload the APK to the connected storage service.</p>
-<form id="form">
-<label class="field"><span>App name *</span><input id="name" required maxlength="50" placeholder="e.g. Nova Notes"></label>
-<label class="field"><span>Developer name</span><input id="developer" maxlength="60" placeholder="Developer or studio"></label>
-<label class="field"><span>Category</span><select id="category"><option>Tools</option><option>Games</option><option>Personalization</option><option>Productivity</option></select></label>
-<label class="field"><span>Short description *</span><textarea id="desc" required maxlength="180" placeholder="What does the app do?"></textarea></label>
-<label class="field"><span>APK file *</span><input id="apk" type="file" accept=".apk,application/vnd.android.package-archive" required></label>
-<label class="field"><span>App icon (optional)</span><input id="icon" type="file" accept="image/png,image/jpeg,image/webp"></label>
-<div class="hint">The APK will be sent to your Render backend at <code>/upload</code> and stored in Storj. Only upload APKs you have permission to distribute.</div>
-<div class="foot">
-<button type="button" class="btn secondary" id="cancel">Cancel</button>
-<button type="submit" id="addListingBtn" class="btn primary">Add Listing</button>
-</div>
-</form>
-</div>
-</div>
-
-<div class="back" id="infoBack">
-<div class="modal">
-<h2>How DroidNova works</h2>
-<p>Search apps, filter categories, and submit an APK listing for this browser session.</p>
-<p><strong>For a real public app store:</strong> connect a backend/database and cloud file storage, and add admin approval, malware scanning, developer information, and privacy policies.</p>
-<div class="foot"><button type="button" class="btn primary" id="closeInfo">Got it</button></div>
-</div>
-</div>
-
-<div class="toast" id="toast"></div>
+<footer>Nova Store · Discover apps, explore more.</footer>
 
 <script>
-const examples=[
-{name:"Pulse Notes",dev:"DroidNova Studio",cat:"Productivity",icon:"✎",desc:"A clean space for quick notes, ideas, and everyday lists.",size:"8.4 MB",rating:"4.8"},
-{name:"Orbit Runner",dev:"Pixel North",cat:"Games",icon:"◉",desc:"A fast arcade challenge built around timing and focus.",size:"42 MB",rating:"4.6"},
-{name:"Device Lens",dev:"Nova Tools",cat:"Tools",icon:"⌁",desc:"A handy concept for checking useful device information.",size:"5.2 MB",rating:"4.5"},
-{name:"Aura Wallpapers",dev:"Soft Pixel",cat:"Personalization",icon:"✺",desc:"Give your home screen a fresh look with vivid backgrounds.",size:"18 MB",rating:"4.7"},
-{name:"Focus Timer",dev:"Bright Minute",cat:"Productivity",icon:"◷",desc:"Simple focus sessions for study, reading, and deep work.",size:"6.1 MB",rating:"4.9"},
-{name:"Tiny Blocks",dev:"Pocket Forge",cat:"Games",icon:"▦",desc:"A relaxing block puzzle for a quick break.",size:"29 MB",rating:"4.4"}
+/*
+  BACKEND SETUP:
+  Set API_BASE to your deployed backend URL.
+  Expected API:
+  GET  /api/apps       -> JSON array of published apps
+  POST /api/upload     -> multipart form: name, category, description, file
+  The backend must save APKs to Storj and return persistent download URLs.
+*/
+const API_BASE = ""; // Example: "https://your-backend.onrender.com"
+
+let selectedCategory = "All";
+let apps = [
+  {name:"Pixel Adventure",category:"Games",description:"Explore exciting worlds and challenging levels.",icon:"🎮",demo:true},
+  {name:"Smart Tools",category:"Tools",description:"Handy utilities for your everyday tasks.",icon:"🛠️",demo:true},
+  {name:"Focus Notes",category:"Productivity",description:"Keep your notes and daily tasks organised.",icon:"📝",demo:true},
+  {name:"Music Space",category:"Entertainment",description:"Your space for discovering entertainment.",icon:"🎧",demo:true}
 ];
 
-const STORAGE_KEY="droidnova_uploaded_apps_v1";
-let savedApps=[];
-try{
- savedApps=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
- if(!Array.isArray(savedApps))savedApps=[];
-}catch(_){savedApps=[]}
-
-let apps=[...savedApps,...examples.map((x,i)=>({...x,id:"s"+i,file:null,iconData:null}))];
-let cat="All",query="";
-const el=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const grid = document.getElementById("appGrid");
+const empty = document.getElementById("empty");
+const status = document.getElementById("status");
 
 function render(){
- const list=apps.filter(a=>(cat==="All"||a.cat===cat)&&[a.name,a.dev,a.desc,a.cat].join(" ").toLowerCase().includes(query.toLowerCase()));
- el("grid").innerHTML=list.map(a=>`<article class="app"><div class="apptop"><div class="appicon" style="${a.iconData?`background-image:url('${a.iconData}');color:transparent`:''}">${a.iconData?"":esc(a.icon)}</div><div><h3>${esc(a.name)}</h3><div class="dev">${esc(a.dev||"Independent developer")}</div><div class="tag">${esc(a.cat)}</div></div></div><div class="desc">${esc(a.desc)}</div><div class="meta"><span>★ ${esc(a.rating||"New")}</span><span>${esc(a.size||"APK")}</span></div><div class="appactions"><button type="button" class="get" data-dl="${esc(a.id)}">Download APK</button><button type="button" class="details" data-info="${esc(a.id)}">Details</button></div></article>`).join("");
- el("empty").style.display=list.length?"none":"block";
- el("count").textContent=String(apps.length).padStart(2,"0");
- document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>download(b.dataset.dl));
- document.querySelectorAll("[data-info]").forEach(b=>b.onclick=()=>{const a=apps.find(x=>x.id===b.dataset.info);if(a)toast(a.name+" · "+a.cat)});
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  const filtered = apps.filter(a =>
+    (selectedCategory==="All" || a.category===selectedCategory) &&
+    (a.name+" "+a.description+" "+a.category).toLowerCase().includes(q)
+  );
+  grid.replaceChildren();
+  empty.hidden = filtered.length > 0;
+
+  filtered.forEach(a => {
+    const card = document.createElement("article");
+    card.className = "card";
+    const icon = document.createElement("div");
+    icon.className = "appicon";
+    icon.textContent = a.icon || "📦";
+
+    const name = document.createElement("h3");
+    name.textContent = a.name;
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = a.category;
+    const desc = document.createElement("p");
+    desc.className = "description";
+    desc.textContent = a.description || "Explore this app.";
+    const btn = document.createElement("button");
+    btn.className = "download";
+    btn.textContent = a.demo ? "Demo listing" : "Download APK";
+    btn.disabled = !!a.demo || !a.downloadUrl;
+    if(!a.demo && a.downloadUrl){
+      btn.disabled = false;
+      btn.onclick = () => { window.location.href = a.downloadUrl; };
+    }
+    card.append(icon,name,meta,desc,btn);
+    grid.append(card);
+  });
 }
 
-function toast(s){
- el("toast").textContent=s;
- el("toast").style.display="block";
- clearTimeout(window.tt);
- window.tt=setTimeout(()=>el("toast").style.display="none",4000);
-}
+document.getElementById("search").addEventListener("input",render);
 
-function download(id){
- const a=apps.find(x=>x.id===id);
- if(!a)return;
- if(a.downloadUrl){window.open(a.downloadUrl,"_blank","noopener");return}
- toast("Sample listing only — no APK is attached.");
-}
-
-el("search").oninput=e=>{query=e.target.value;render()};
-document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{
- cat=b.dataset.cat;
- document.querySelectorAll("[data-cat]").forEach(x=>x.classList.toggle("active",x===b));
- render();
+document.querySelectorAll("[data-cat]").forEach(btn => {
+  btn.addEventListener("click",()=>{
+    selectedCategory = btn.dataset.cat;
+    document.querySelectorAll("[data-cat]").forEach(b=>b.classList.toggle("active",b===btn));
+    render();
+  });
 });
 
-function open(id){el(id).classList.add("show")}
-function close(id){el(id).classList.remove("show")}
+document.getElementById("openUpload").onclick = () => {
+  const panel = document.getElementById("uploadPanel");
+  panel.style.display = panel.style.display==="block" ? "none" : "block";
+  if(panel.style.display==="block") panel.scrollIntoView({behavior:"smooth",block:"start"});
+};
+document.getElementById("cancelUpload").onclick = () => {
+  document.getElementById("uploadPanel").style.display="none";
+  status.textContent="";
+};
 
-el("submitBtn").onclick=()=>open("uploadBack");
-el("cancel").onclick=()=>close("uploadBack");
-el("explore").onclick=()=>el("catalog").scrollIntoView({behavior:"smooth"});
-el("how").onclick=()=>open("infoBack");
-el("closeInfo").onclick=()=>close("infoBack");
-document.querySelectorAll(".back").forEach(b=>b.onclick=e=>{if(e.target===b)close(b.id)});
-
-el("form").addEventListener("submit",async function(e){
- e.preventDefault();
-
- const file=el("apk").files[0];
- if(!file||!file.name.toLowerCase().endsWith(".apk")){
-  toast("Please select a valid .apk file.");
-  return;
- }
-
- const submit=el("addListingBtn");
- if(!submit){
-  console.error("Add Listing button not found");
-  toast("Upload button not found. Refresh the page and try again.");
-  return;
- }
-
- submit.disabled=true;
- submit.textContent="Uploading…";
-
- try{
-  const body=new FormData();
-  body.append("file",file);
-
-  console.log("[UPLOAD] Sending APK to /upload");
-  const response=await fetch("/upload",{method:"POST",body:body});
-
-  const raw=await response.text();
-  let result={};
-  try{result=JSON.parse(raw)}catch(_){result={message:raw}}
-
-  if(!response.ok){
-   throw new Error(result.error||result.message||("Upload failed (HTTP "+response.status+")"));
+document.getElementById("uploadForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const form = e.currentTarget;
+  const file = form.elements.file.files[0];
+  if(!file) return;
+  if(!file.name.toLowerCase().endsWith(".apk")){
+    status.textContent="Please select an APK file.";
+    return;
   }
-
-  const downloadUrl=result.url||result.downloadUrl||result.download_url||result.publicUrl||result.public_url||result.location||result.fileUrl;
-  if(!downloadUrl){
-   throw new Error("The server did not return a download URL.");
+  if(!API_BASE){
+    status.textContent="Upload backend is not connected yet. Connect your API and Storj bucket first.";
+    return;
   }
-
-  let iconData=null;
-  const icon=el("icon").files[0];
-
-  if(icon){
-   iconData=await new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=()=>reject(new Error("Could not read icon"));
-    reader.readAsDataURL(icon);
-   });
+  const data = new FormData(form);
+  const submit = form.querySelector('[type="submit"]');
+  submit.disabled = true;
+  status.textContent="Uploading... Please wait.";
+  try{
+    const response = await fetch(API_BASE + "/api/upload",{method:"POST",body:data});
+    const result = await response.json();
+    if(!response.ok) throw new Error(result.error || "Upload failed");
+    status.textContent="Upload successful!";
+    await loadApps();
+    form.reset();
+    render();
+  }catch(err){
+    status.textContent="Upload error: "+err.message;
+  }finally{
+    submit.disabled=false;
   }
-
-  const app={
-   id:"u"+Date.now(),
-   name:el("name").value.trim(),
-   dev:el("developer").value.trim()||"Independent developer",
-   cat:el("category").value,
-   desc:el("desc").value.trim(),
-   icon:"◈",
-   iconData,
-   downloadUrl,
-   fileName:file.name,
-   size:(file.size/1048576).toFixed(1)+" MB",
-   rating:"New"
-  };
-
-  savedApps.unshift(app);
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(savedApps));
-  apps=[...savedApps,...examples.map((x,i)=>({...x,id:"s"+i,file:null,iconData:null}))];
-
-  render();
-  this.reset();
-  close("uploadBack");
-  toast("APK uploaded to storage and listing saved!");
-
- }catch(err){
-  console.error("[UPLOAD ERROR]",err);
-  toast(err.message||"Upload failed. Check Render logs.");
- }finally{
-  submit.disabled=false;
-  submit.textContent="Add Listing";
- }
 });
 
+async function loadApps(){
+  if(!API_BASE) return;
+  try{
+    const response = await fetch(API_BASE+"/api/apps");
+    if(!response.ok) throw new Error("Could not load apps");
+    const data = await response.json();
+    if(Array.isArray(data)) apps = data;
+    render();
+  }catch(err){
+    console.error("App listing error:",err);
+  }
+}
 render();
+loadApps();
 </script>
 </body>
- </html>
+</html>
