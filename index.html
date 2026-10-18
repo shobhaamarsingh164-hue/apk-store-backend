@@ -3,17 +3,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b1020">
-<title>Nova Store | Apps & Games</title>
+<title>Nova Store - Apps & Games</title>
 
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b1020;color:#f5f6ff;font-family:Arial,sans-serif}
-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 5%;background:#11182af5;border-bottom:1px solid #29334d}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:15px 5%;background:#11182af5;border-bottom:1px solid #29334d;gap:10px}
 .logo{font-size:23px;font-weight:900;color:#b69aff}
 button{border:0;border-radius:11px;padding:12px 15px;font-weight:bold;cursor:pointer}
 .primary{background:#8b5cf6;color:white}
+button:disabled{opacity:.6;cursor:wait}
 main{max-width:1150px;margin:auto;padding:24px 5%}
 .hero{padding:32px 24px;border-radius:22px;background:linear-gradient(120deg,#4c1d95,#312e81,#172554);margin-bottom:22px}
 .hero h1{font-size:clamp(28px,6vw,44px);margin:0 0 12px}
@@ -22,6 +23,14 @@ main{max-width:1150px;margin:auto;padding:24px 5%}
 .categories{display:flex;gap:9px;overflow-x:auto;padding:18px 0}
 .categories button{background:#1a2339;color:#d4dbea;white-space:nowrap}
 .categories button.active{background:#8b5cf6;color:white}
+.panel{display:none;margin:22px 0;padding:20px;border:1px solid #35405b;border-radius:17px;background:#141c30}
+.panel input,.panel select,.panel textarea{display:block;width:100%;margin:9px 0 16px;padding:12px;border:1px solid #35415e;border-radius:10px;background:#0b1020;color:white}
+.panel label{font-size:14px}
+.progress-wrap{display:none;margin:18px 0}
+.progress-info{display:flex;justify-content:space-between;gap:10px;margin-bottom:9px;font-size:14px}
+.track{height:12px;background:#29334d;border-radius:20px;overflow:hidden}
+.bar{height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#c4b5fd);border-radius:20px;transition:width .15s}
+#status{font-size:14px;color:#c4b5fd;overflow-wrap:anywhere;line-height:1.5}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
 .card{background:#141c30;border:1px solid #293650;border-radius:17px;padding:16px;min-width:0}
 .appicon{width:62px;height:62px;border-radius:17px;background:linear-gradient(135deg,#4338ca,#a855f7);display:grid;place-items:center;font-size:29px;margin-bottom:13px}
@@ -29,18 +38,13 @@ main{max-width:1150px;margin:auto;padding:24px 5%}
 .meta{font-size:12px;color:#a5b4cf;margin:8px 0}
 .desc{font-size:14px;line-height:1.5;color:#c6cfe0;min-height:42px;overflow-wrap:anywhere}
 .download{width:100%;background:#293653;color:white;margin-top:8px}
-.download:disabled{opacity:.65;cursor:default}
-.panel{display:none;margin:22px 0;padding:20px;border:1px solid #35405b;border-radius:17px;background:#141c30}
-.panel input,.panel select,.panel textarea{display:block;width:100%;margin:9px 0 16px;padding:12px;border:1px solid #35415e;border-radius:10px;background:#0b1020;color:white}
-.panel label{font-size:14px}
-#status{font-size:14px;color:#c4b5fd;overflow-wrap:anywhere;line-height:1.5}
 .empty{color:#aab5cb}
 footer{text-align:center;padding:28px 12px;color:#8996b1;font-size:13px}
 @media(max-width:480px){header{padding:12px 4%}.logo{font-size:19px}.primary{padding:11px;font-size:12px}main{padding:18px 4%}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:12px}.hero{padding:24px 18px}}
 </style>
 </head>
-
 <body>
+
 <header>
   <div class="logo">✦ Nova Store</div>
   <button class="primary" id="openUpload">＋ Upload APK</button>
@@ -55,7 +59,7 @@ footer{text-align:center;padding:28px 12px;color:#8996b1;font-size:13px}
 
   <input class="search" id="search" placeholder="Search apps and games..." aria-label="Search apps">
 
-  <div class="categories" id="categories">
+  <div class="categories">
     <button class="active" data-cat="All">All</button>
     <button data-cat="Games">Games</button>
     <button data-cat="Apps">Apps</button>
@@ -70,10 +74,10 @@ footer{text-align:center;padding:28px 12px;color:#8996b1;font-size:13px}
 
     <form id="uploadForm">
       <label for="appName">App name</label>
-      <input id="appName" name="name" required maxlength="80" placeholder="Enter app name">
+      <input id="appName" required maxlength="80" placeholder="Enter app name">
 
       <label for="category">Category</label>
-      <select id="category" name="category">
+      <select id="category">
         <option>Games</option>
         <option>Apps</option>
         <option>Tools</option>
@@ -82,13 +86,24 @@ footer{text-align:center;padding:28px 12px;color:#8996b1;font-size:13px}
       </select>
 
       <label for="description">Description</label>
-      <textarea id="description" name="description" required maxlength="300" placeholder="Describe your app"></textarea>
+      <textarea id="description" required maxlength="300" placeholder="Describe your app"></textarea>
 
       <label for="file">Select APK file</label>
-      <input id="file" name="file" type="file" accept=".apk,application/vnd.android.package-archive" required>
+      <input id="file" type="file" accept=".apk,application/vnd.android.package-archive" required>
 
       <button class="primary" id="submitUpload" type="submit">Upload APK</button>
-      <button type="button" id="cancelUpload" style="background:#293653;color:white">Cancel</button>
+      <button id="cancelUpload" type="button" style="background:#293653;color:white">Cancel</button>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-info">
+          <span id="progressLabel">Uploading APK...</span>
+          <strong id="progressPercent">0%</strong>
+        </div>
+        <div class="track">
+          <div class="bar" id="progressBar"></div>
+        </div>
+      </div>
+
       <p id="status" role="status" aria-live="polite"></p>
     </form>
   </section>
@@ -101,20 +116,8 @@ footer{text-align:center;padding:28px 12px;color:#8996b1;font-size:13px}
 <footer>Nova Store · Discover apps, explore more.</footer>
 
 <script>
-/*
-  IMPORTANT:
-  Enter your actual Render backend URL below.
-  Example: https://your-service.onrender.com
-
-  Existing server.js endpoint:
-  POST /upload
-
-  Your current server.js does NOT have a GET /api/apps endpoint.
-  This page therefore keeps locally uploaded listing details in
-  this browser, but this is not shared or permanent storage.
-*/
-
-const API_BASE = "https://apk-store-backend.onrender.com";
+// Replace this with your actual Render backend URL.
+const API_BASE = "https://YOUR-RENDER-SERVICE.onrender.com";
 
 const grid = document.getElementById("appGrid");
 const empty = document.getElementById("empty");
@@ -122,160 +125,218 @@ const panel = document.getElementById("uploadPanel");
 const form = document.getElementById("uploadForm");
 const status = document.getElementById("status");
 const submit = document.getElementById("submitUpload");
+const progressWrap = document.getElementById("progressWrap");
+const progressBar = document.getElementById("progressBar");
+const progressPercent = document.getElementById("progressPercent");
+const progressLabel = document.getElementById("progressLabel");
 
 let selectedCategory = "All";
+let currentXHR = null;
+
 let apps = [
   {name:"Pixel Adventure",category:"Games",description:"Discover exciting gaming adventures.",icon:"🎮",demo:true},
   {name:"Smart Tools",category:"Tools",description:"Useful utilities for everyday tasks.",icon:"🛠️",demo:true},
   {name:"Focus Notes",category:"Productivity",description:"Organise your notes and daily tasks.",icon:"📝",demo:true},
-  {name:"Music Space",category:"Entertainment",description:"Discover your next entertainment app.",icon:"🎧",demo:true}
+  {name:"Music Space",category:"Entertainment",description:"Discover entertainment apps.",icon:"🎧",demo:true}
 ];
 
 function renderApps(){
-  const query = document.getElementById("search").value.toLowerCase().trim();
-
-  const filtered = apps.filter(app =>
-    (selectedCategory === "All" || app.category === selectedCategory) &&
-    (app.name + " " + app.category + " " + app.description).toLowerCase().includes(query)
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  const filtered = apps.filter(a =>
+    (selectedCategory==="All" || a.category===selectedCategory) &&
+    (a.name+" "+a.category+" "+a.description).toLowerCase().includes(q)
   );
 
   grid.replaceChildren();
   empty.hidden = filtered.length > 0;
 
-  filtered.forEach(app => {
+  filtered.forEach(a=>{
     const card = document.createElement("article");
-    card.className = "card";
+    card.className="card";
 
-    const icon = document.createElement("div");
-    icon.className = "appicon";
-    icon.textContent = app.icon || "📦";
+    const icon=document.createElement("div");
+    icon.className="appicon";
+    icon.textContent=a.icon||"📦";
 
-    const title = document.createElement("h3");
-    title.textContent = app.name;
+    const title=document.createElement("h3");
+    title.textContent=a.name;
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = app.category || "Apps";
+    const meta=document.createElement("div");
+    meta.className="meta";
+    meta.textContent=a.category;
 
-    const description = document.createElement("p");
-    description.className = "desc";
-    description.textContent = app.description || "Explore this app.";
+    const desc=document.createElement("p");
+    desc.className="desc";
+    desc.textContent=a.description||"Explore this app.";
 
-    const button = document.createElement("button");
-    button.className = "download";
+    const btn=document.createElement("button");
+    btn.className="download";
 
-    if(app.demo){
-      button.textContent = "Demo listing";
-      button.disabled = true;
-    }else if(app.downloadUrl){
-      button.textContent = "Download APK";
-      button.onclick = () => {
-        window.location.href = app.downloadUrl;
-      };
+    if(a.demo){
+      btn.textContent="Demo listing";
+      btn.disabled=true;
+    }else if(a.downloadUrl){
+      btn.textContent="Download APK";
+      btn.onclick=()=>{window.location.href=a.downloadUrl;};
     }else{
-      button.textContent = "Download unavailable";
-      button.disabled = true;
+      btn.textContent="Download unavailable";
+      btn.disabled=true;
     }
 
-    card.append(icon,title,meta,description,button);
+    card.append(icon,title,meta,desc,btn);
     grid.append(card);
   });
 }
 
 document.getElementById("search").addEventListener("input",renderApps);
 
-document.querySelectorAll("[data-cat]").forEach(button => {
-  button.addEventListener("click",()=>{
-    selectedCategory = button.dataset.cat;
-    document.querySelectorAll("[data-cat]").forEach(item=>{
-      item.classList.toggle("active",item===button);
+document.querySelectorAll("[data-cat]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    selectedCategory=btn.dataset.cat;
+    document.querySelectorAll("[data-cat]").forEach(b=>{
+      b.classList.toggle("active",b===btn);
     });
     renderApps();
   });
 });
 
-document.getElementById("openUpload").addEventListener("click",()=>{
-  panel.style.display = panel.style.display === "block" ? "none" : "block";
-  if(panel.style.display === "block"){
+document.getElementById("openUpload").onclick=()=>{
+  panel.style.display=panel.style.display==="block"?"none":"block";
+  if(panel.style.display==="block"){
     panel.scrollIntoView({behavior:"smooth",block:"start"});
   }
-});
+};
 
-document.getElementById("explore").addEventListener("click",()=>{
+document.getElementById("explore").onclick=()=>{
   document.getElementById("appsHeading").scrollIntoView({behavior:"smooth"});
-});
+};
 
-document.getElementById("cancelUpload").addEventListener("click",()=>{
-  panel.style.display = "none";
-  status.textContent = "";
-});
+document.getElementById("cancelUpload").onclick=()=>{
+  if(currentXHR){
+    currentXHR.abort();
+    return;
+  }
+  panel.style.display="none";
+  status.textContent="";
+};
 
-form.addEventListener("submit",async event=>{
+form.addEventListener("submit",event=>{
   event.preventDefault();
 
-  const file = document.getElementById("file").files[0];
+  if(currentXHR) return;
 
-  if(!file){
-    status.textContent = "Please select an APK file.";
+  const file=document.getElementById("file").files[0];
+  const name=document.getElementById("appName").value.trim();
+  const category=document.getElementById("category").value;
+  const description=document.getElementById("description").value.trim();
+
+  if(!file||!file.name.toLowerCase().endsWith(".apk")){
+    status.textContent="Please select a valid APK file.";
     return;
   }
 
-  if(!file.name.toLowerCase().endsWith(".apk")){
-    status.textContent = "Please select a valid APK file.";
+  if(!API_BASE||API_BASE.includes("https://apk-store-backend.onrender.com")){
+    status.textContent="Please enter your actual Render backend URL in API_BASE.";
     return;
   }
 
-  if(!API_BASE || API_BASE.includes("YOUR-RENDER-SERVICE")){
-    status.textContent = "Please enter your actual Render backend URL in API_BASE first.";
-    return;
-  }
-
-  const name = document.getElementById("appName").value.trim();
-  const category = document.getElementById("category").value;
-  const description = document.getElementById("description").value.trim();
-
-  const data = new FormData();
+  const data=new FormData();
   data.append("file",file);
 
-  submit.disabled = true;
-  status.textContent = "Uploading APK... Please wait.";
+  const xhr=new XMLHttpRequest();
+  currentXHR=xhr;
+  submit.disabled=true;
+  progressWrap.style.display="block";
+  progressBar.style.width="0%";
+  progressPercent.textContent="0%";
+  progressLabel.textContent="Sending APK";
+  status.textContent="Connecting to server...";
 
-  try{
-    const response = await fetch(API_BASE.replace(/\/+$/,"") + "/upload",{
-      method:"POST",
-      body:data
-    });
+  xhr.open("POST",API_BASE.replace(/\/+$/,"")+"/upload");
+  xhr.timeout=15*60*1000;
 
-    const result = await response.json().catch(()=>({}));
+  xhr.upload.onloadstart=()=>{
+    status.textContent="Upload started...";
+  };
 
-    if(!response.ok || !result.success){
-      throw new Error(result.error || "Upload failed. Check Render logs.");
+  xhr.upload.onprogress=e=>{
+    if(e.lengthComputable){
+      const percent=Math.min(100,Math.round(e.loaded/e.total*100));
+      progressBar.style.width=percent+"%";
+      progressPercent.textContent=percent+"%";
+      progressLabel.textContent=percent===100
+        ?"Saving APK to Storj..."
+        :"Uploading APK";
+      status.textContent=percent===100
+        ?"File sent. Waiting for Storj to finish saving..."
+        :"Uploaded "+formatBytes(e.loaded)+" of "+formatBytes(e.total);
     }
+  };
 
-    apps.unshift({
-      name,
-      category,
-      description,
-      icon: category === "Games" ? "🎮" :
-            category === "Tools" ? "🛠️" :
-            category === "Entertainment" ? "🎧" : "📱",
-      downloadUrl: result.url || "",
-      demo:false
-    });
+  xhr.onload=()=>{
+    try{
+      const result=JSON.parse(xhr.responseText);
 
-    renderApps();
-    form.reset();
+      if(xhr.status<200||xhr.status>=300||!result.success){
+        throw new Error(result.error||"Upload failed.");
+      }
 
-    status.textContent = result.url
-      ? "APK uploaded to Storj successfully. This listing is currently visible in this browser only."
-      : "Upload completed, but no download URL was returned.";
+      progressBar.style.width="100%";
+      progressPercent.textContent="100%";
+      progressLabel.textContent="Upload complete";
 
-  }catch(error){
-    status.textContent = "Upload error: " + error.message;
-  }finally{
-    submit.disabled = false;
-  }
+      apps.unshift({
+        name,
+        category,
+        description,
+        icon:category==="Games"?"🎮":
+             category==="Tools"?"🛠️":
+             category==="Entertainment"?"🎧":"📱",
+        downloadUrl:result.url||"",
+        demo:false
+      });
+
+      renderApps();
+      form.reset();
+
+      status.textContent=result.url
+        ?"Success! APK saved to Storj. Listing currently exists in this browser session only."
+        :"Upload succeeded, but the server did not return a download URL.";
+    }catch(err){
+      status.textContent="Upload error: "+err.message;
+    }finally{
+      currentXHR=null;
+      submit.disabled=false;
+    }
+  };
+
+  xhr.onerror=()=>{
+    status.textContent="Network error. Check your Render URL, CORS and server logs.";
+    currentXHR=null;
+    submit.disabled=false;
+  };
+
+  xhr.ontimeout=()=>{
+    status.textContent="Upload timed out. Check Render logs and Storj.";
+    currentXHR=null;
+    submit.disabled=false;
+  };
+
+  xhr.onabort=()=>{
+    status.textContent="Upload cancelled.";
+    currentXHR=null;
+    submit.disabled=false;
+    progressLabel.textContent="Cancelled";
+  };
+
+  xhr.send(data);
 });
+
+function formatBytes(bytes){
+  if(bytes<1024)return bytes+" B";
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB";
+  return (bytes/(1024*1024)).toFixed(1)+" MB";
+}
 
 renderApps();
 </script>
